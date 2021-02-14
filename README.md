@@ -1,0 +1,3 @@
+# crefx
+.pyc
+.idea
