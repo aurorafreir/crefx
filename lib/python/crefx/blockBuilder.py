@@ -89,4 +89,3 @@ class ThreeJointIK(object):
         cmds.setAttr(self.prefix+'_Shoulder_CTRL.scale', lock=True)
         cmds.setAttr(self.prefix+'_Shoulder_CTRL.visibility', lock=True)
         cmds.select(d=1)
-

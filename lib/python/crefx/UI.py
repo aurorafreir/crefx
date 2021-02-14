@@ -37,7 +37,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.button.clicked.connect(self.buildBlock)
 
     def buildBlock(self):
-        prefix = self.textField.text()
+        prefix = self.textField().text()
 
         import crefx.blockBuilder as bb
         reload(bb)
