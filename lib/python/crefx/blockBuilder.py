@@ -24,7 +24,16 @@ class ThreeJointIK(object):
         self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.block_name=block_name
 
+        self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
+
     # TODO def group structure:
+    def grp_structure(self):
+        self.grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + self.ext[0])
+        for item in self.sub_grps:
+            grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + item + '_' + self.ext[0], p=self.grp)
+            for attr in ['t', 's', 'r']:
+                cmds.setAttr(grp + '.' + attr, lock=True)
+        cmds.select(d=1)
 
     def build(self):
         # Create joints for chain
