@@ -1,5 +1,8 @@
 import maya.cmds as cmds
 
+# TODO Twist Joints
+# TODO End joint orient constraint
+
 class ThreeJointIK(object):
     def __init__(self,
                  prefix='L', # prefix is a prefix before the joint, group (and etc) names, e.g. 'L' or 'R'
@@ -21,6 +24,8 @@ class ThreeJointIK(object):
         self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.block_name=block_name
 
+    # TODO def group structure:
+
     def build(self):
         # Create joints for chain
         cmds.joint(n=self.prefix + '_' + self.joint_one, p=self.start_location) # joint_one
@@ -41,12 +46,11 @@ class ThreeJointIK(object):
 
 
         # Create IK control circle, parent it to empty group, and move to Wrist joint
-        cmds.circle(n=self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1], nrx=1, nrz=0)
-        cmds.group(n=self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[0], em=1)
-        cmds.parent(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1],
-                    self.prefix +'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[0])
-        cmds.xform(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[0],
-                   t=(cmds.xform(self.prefix + '_' + self.joint_three, q=1, t=1, ws=1)))
+        IKCC = self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_'
+        cmds.circle(n=IKCC + self.ext[1], nrx=1, nrz=0)
+        cmds.group(n=IKCC + self.ext[0], em=1)
+        cmds.parent(IKCC + self.ext[1], IKCC + self.ext[0])
+        cmds.xform(IKCC + self.ext[0], t=(cmds.xform(self.prefix + '_' + self.joint_three, q=1, t=1, ws=1)))
 
 
         # Parent the IK Handle to the IK Controller   # e.g. "L_Arm_IK" > "L_Wrist_IK_CTRL"
@@ -55,13 +59,14 @@ class ThreeJointIK(object):
 
 
         # Create Shoulder controller, parent it to empty group, and move to Shoulder joint
-        cmds.circle(n=self.prefix + '_' + self.joint_one+ '_' + self.ext[1], nrx=1, nrz=0)
-        cmds.group(n=self.prefix + '_' + self.joint_one+ '_' + self.ext[0], em=1)
-        cmds.parent(self.prefix + '_' + self.joint_one + '_' + self.ext[1],
-                    self.prefix + '_' + self.joint_one + '_' + self.ext[0])
-        cmds.xform(self.prefix + '_' + self.joint_one + '_' + self.ext[0], t=(cmds.xform(self.prefix + '_' + self.joint_one, q=1, t=1, ws=1)))
+        jnt_one_ctrl = self.prefix + '_' + self.joint_one + '_'
+        cmds.circle(n=jnt_one_ctrl + self.ext[1], nrx=1, nrz=0)
+        cmds.group(n=jnt_one_ctrl+ self.ext[0], em=1)
+        cmds.parent(jnt_one_ctrl + self.ext[1],
+                    jnt_one_ctrl + self.ext[0])
+        cmds.xform(jnt_one_ctrl + self.ext[0], t=(cmds.xform(self.prefix + '_' + self.joint_one, q=1, t=1, ws=1)))
         # Parent constrain joint_one to the Controller
-        cmds.parentConstraint(self.prefix + '_' + self.joint_one + '_' + self.ext[1], self.prefix + '_' + self.joint_one)
+        cmds.parentConstraint(jnt_one_ctrl + self.ext[1], self.prefix + '_' + self.joint_one)
 
 
         # Create Pole Vector controller that looks visually distinct from the others
@@ -95,12 +100,14 @@ class ThreeJointIK(object):
         cmds.hide(self.prefix+'_' + self.block_name + '_' + self.ext[2])
         # delete history on joint_one, joint_three, and PV controller   # e.g. "L_Wrist_IK_CTRL", "L_PV_IK_CTRL"
         cmds.bakePartialHistory(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1])
-        cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[2] + '_' + self.ext[1])
+        cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[1])
+        cmds.bakePartialHistory(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1])
         # Lock the Scale and View attributes on the controllers
+        # TODO set up for loops for these
             # e.g. "L_Wrist_IK_CTRL"
-        cmds.setAttr(self.prefix+'_' + self.joint_three + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
-        cmds.setAttr(self.prefix+'_' + self.joint_three + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
             # e.g. "L_Shoulder_CTRL"
-        cmds.setAttr(self.prefix+'_' + self.joint_one + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
-        cmds.setAttr(self.prefix+'_' + self.joint_one + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.scale', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.visibility', lock=True)
         cmds.select(d=1)

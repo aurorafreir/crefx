@@ -20,7 +20,7 @@ class BlockBuilder(QtWidgets.QWidget):
         # Set the object name
         self.setObjectName('CreateBlockUI_UniqueId')
         self.setWindowTitle('Create Block')
-        self.setGeometry(50, 50, 250, 250)
+        self.setGeometry(50, 50, 500, 250)
 
         # text and textbox for block_name
         self.textFieldBlockName = QtWidgets.QLineEdit(self, text="Arm")
@@ -40,17 +40,31 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textPrefix = QtWidgets.QLabel(self, text="Joint One")
         self.textPrefix.setGeometry(10,70,70,30)
 
+        # text and textbox for joint_one position
+        self.textFieldJointOnePos = QtWidgets.QLineEdit(self, text="0,0,0")
+        self.textFieldJointOnePos.setGeometry(280, 70, 150, 30)
+        self.textPrefix = QtWidgets.QLabel(self, text="Position")
+        self.textPrefix.setGeometry(230, 70, 40, 30)
+
         # text and textbox for joint_two
         self.textFieldJointTwo = QtWidgets.QLineEdit(self, text="Elbow")
         self.textFieldJointTwo.setGeometry(80, 100, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Joint Two")
         self.textPrefix.setGeometry(10,100,70,30)
 
+        # TODO Joint Push Back textbox
+
         # text and textbox for joint_three
         self.textFieldJointThree = QtWidgets.QLineEdit(self, text="Wrist")
         self.textFieldJointThree.setGeometry(80, 130, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Joint Three")
         self.textPrefix.setGeometry(10,130,70,30)
+
+        # text and textbox for joint_three position
+        self.textFieldJointThreePos = QtWidgets.QLineEdit(self, text="10,0,0")
+        self.textFieldJointThreePos.setGeometry(280, 130, 150, 30)
+        self.textPrefix = QtWidgets.QLabel(self, text="Position")
+        self.textPrefix.setGeometry(230, 130, 40, 30)
 
         # button to call the buildBlock function
         self.button = QtWidgets.QPushButton(self, text="Build")
@@ -64,6 +78,9 @@ class BlockBuilder(QtWidgets.QWidget):
         joint_two = self.textFieldJointTwo.text()
         joint_three = self.textFieldJointThree.text()
         block_name = self.textFieldBlockName.text()
+        start_position = self.textFieldJointOnePos.text()
+        end_position = self.textFieldJointThreePos.text()
+        # TODO add start joint loc and end joint loc
 
         import crefx.blockBuilder as bb
         reload(bb)
