@@ -52,7 +52,11 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textPrefix = QtWidgets.QLabel(self, text="Joint Two")
         self.textPrefix.setGeometry(10,100,70,30)
 
-        # TODO Joint Push Back textbox
+        # text and textbox for mid_joint_push_back
+        self.textFieldJointTwoPos = QtWidgets.QLineEdit(self, text="1")
+        self.textFieldJointTwoPos.setGeometry(280, 100, 150, 30)
+        self.textPrefix = QtWidgets.QLabel(self, text="Mid Joint Z")
+        self.textPrefix.setGeometry(230, 100, 40, 30)
 
         # text and textbox for joint_three
         self.textFieldJointThree = QtWidgets.QLineEdit(self, text="Wrist")
@@ -80,7 +84,6 @@ class BlockBuilder(QtWidgets.QWidget):
         block_name = self.textFieldBlockName.text()
         start_position = self.textFieldJointOnePos.text()
         end_position = self.textFieldJointThreePos.text()
-        # TODO add start joint loc and end joint loc
 
         import crefx.blockBuilder as bb
         reload(bb)
@@ -89,7 +92,11 @@ class BlockBuilder(QtWidgets.QWidget):
                                 joint_one=joint_one,
                                 joint_two=joint_two,
                                 joint_three=joint_three,
-                                block_name=block_name)
+                                block_name=block_name,
+                                start_location=tuple([int(x) for x in start_position.split(',')]),
+                                end_location=tuple([int(x) for x in end_position.split(',')]),
+                                mid_joint_push_back=int(textFieldJointTwoPos))
+        block.grp_structure()
         block.build()
 
         print "build block", prefix + '_' + block_name
