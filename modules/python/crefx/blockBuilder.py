@@ -1,8 +1,5 @@
 import maya.cmds as cmds
 
-# TODO Twist Joints
-# TODO End joint orient constraint
-
 class ThreeJointIK(object):
     def __init__(self,
                  prefix='L', # prefix is a prefix before the joint, group (and etc) names, e.g. 'L' or 'R'
@@ -14,6 +11,7 @@ class ThreeJointIK(object):
                  joint_three='Wrist',
                  block_name='Arm' # overall name for the body part
                  ):
+        # TODO load variables from extensions.json
         self.prefix = prefix
         self.start_location = start_location
         self.end_location = end_location
@@ -26,7 +24,7 @@ class ThreeJointIK(object):
 
         self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
 
-    # TODO def group structure:
+
     def grp_structure(self):
         self.grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + self.ext[0])
         for item in self.sub_grps:
@@ -34,8 +32,13 @@ class ThreeJointIK(object):
             for attr in ['t', 's', 'r']:
                 cmds.setAttr(grp + '.' + attr, lock=True)
         cmds.select(d=1)
+        # TODO set up parenting
 
     def build(self):
+        # TODO Twist Joints
+        # TODO End joint orient constraint
+        # TODO FKIK
+
         # Create joints for chain
         cmds.joint(n=self.prefix + '_' + self.joint_one, p=self.start_location) # joint_one
         cmds.joint(n=self.prefix + '_' + self.joint_two,

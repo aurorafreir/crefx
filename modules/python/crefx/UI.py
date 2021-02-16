@@ -22,6 +22,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.setWindowTitle('Create Block')
         self.setGeometry(50, 50, 500, 250)
 
+
         # text and textbox for block_name
         self.textFieldBlockName = QtWidgets.QLineEdit(self, text="Arm")
         self.textFieldBlockName.setGeometry(80, 10, 150, 30)
@@ -33,6 +34,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textFieldPrefix.setGeometry(80, 40, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Block Prefix")
         self.textPrefix.setGeometry(10,40,70,30)
+
 
         # text and textbox for joint_one
         self.textFieldJointOne = QtWidgets.QLineEdit(self, text="Shoulder")
@@ -46,6 +48,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textPrefix = QtWidgets.QLabel(self, text="Position")
         self.textPrefix.setGeometry(230, 70, 40, 30)
 
+
         # text and textbox for joint_two
         self.textFieldJointTwo = QtWidgets.QLineEdit(self, text="Elbow")
         self.textFieldJointTwo.setGeometry(80, 100, 150, 30)
@@ -58,6 +61,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textPrefix = QtWidgets.QLabel(self, text="Mid Joint Z")
         self.textPrefix.setGeometry(230, 100, 40, 30)
 
+
         # text and textbox for joint_three
         self.textFieldJointThree = QtWidgets.QLineEdit(self, text="Wrist")
         self.textFieldJointThree.setGeometry(80, 130, 150, 30)
@@ -69,6 +73,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textFieldJointThreePos.setGeometry(280, 130, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Position")
         self.textPrefix.setGeometry(230, 130, 40, 30)
+
 
         # button to call the buildBlock function
         self.button = QtWidgets.QPushButton(self, text="Build")
