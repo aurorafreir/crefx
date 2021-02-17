@@ -14,6 +14,8 @@ class BlockBuilder(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(BlockBuilder, self).__init__()
 
+        self.setWindowFlags(QtCore.Qt.Tool)
+
         self.setParent(maya_main_window())
         self.setWindowFlags(QtCore.Qt.Window)
 
@@ -74,10 +76,15 @@ class BlockBuilder(QtWidgets.QWidget):
         self.textPrefix = QtWidgets.QLabel(self, text="Position")
         self.textPrefix.setGeometry(230, 130, 40, 30)
 
+        # Checkbox to toggle twist joints on or off
+        self.checkboxTwistJoints = QtWidgets.QCheckBox(self, text="Twist Joints")
+        self.checkboxTwistJoints.setGeometry(80, 160, 80, 30)
+        self.textPrefix = QtWidgets.QLabel(self, text="Count")
+        self.textPrefix.setGeometry(230, 130, 40, 30)
 
         # button to call the buildBlock function
         self.button = QtWidgets.QPushButton(self, text="Build")
-        self.button.setGeometry(50, 160, 150, 30)
+        self.button.setGeometry(50, 200, 150, 30)
 
         self.button.clicked.connect(self.buildBlock)
 
@@ -88,7 +95,10 @@ class BlockBuilder(QtWidgets.QWidget):
         joint_three = self.textFieldJointThree.text()
         block_name = self.textFieldBlockName.text()
         start_position = self.textFieldJointOnePos.text()
+        mid_joint_push_back = self.textFieldJointTwoPos.text()
         end_position = self.textFieldJointThreePos.text()
+        toggle_twist_joints = self.checkboxTwistJoints.checkState()
+        #count_twist_joints = self.checkboxCountTwistJoints.text()
 
         import crefx.blockBuilder as bb
         reload(bb)
@@ -100,7 +110,10 @@ class BlockBuilder(QtWidgets.QWidget):
                                 block_name=block_name,
                                 start_location=tuple([int(x) for x in start_position.split(',')]),
                                 end_location=tuple([int(x) for x in end_position.split(',')]),
-                                mid_joint_push_back=int(textFieldJointTwoPos))
+                                mid_joint_push_back=int(mid_joint_push_back),
+                                toggle_twist_joints = toggle_twist_joints,
+                                #count_twist_joints=count_twist_joints
+                                )
         block.grp_structure()
         block.build()
 
