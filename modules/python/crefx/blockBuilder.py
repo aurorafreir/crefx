@@ -9,7 +9,9 @@ class ThreeJointIK(object):
                  joint_one='Shoulder',
                  joint_two='Elbow',
                  joint_three='Wrist',
-                 block_name='Arm' # overall name for the body part
+                 block_name='Arm', # overall name for the body part
+                 toggle_twist_joints=0,
+                 count_twist_joints=2
                  ):
         # TODO load variables from extensions.json
         self.prefix = prefix
@@ -21,6 +23,8 @@ class ThreeJointIK(object):
         self.joint_three = joint_three
         self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.block_name=block_name
+        self.toggle_twist_joints = toggle_twist_joints
+        self.count_twist_joints = count_twist_joints
 
         self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
 
@@ -105,6 +109,11 @@ class ThreeJointIK(object):
         # Pole Vector constrain the IK to the PV Controller     # e.g. "L_PV_IK_CTRL" > "L_Arm_IK"
         cmds.poleVectorConstraint(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1],
                                   self.prefix + '_' + self.block_name + '_' + self.ext[2])
+
+
+        # Twist Joints
+        if self.toggle_twist_joints:
+            print "twist joints on"
 
 
         # Cleanup
