@@ -134,28 +134,28 @@ class ThreeJointIK(object):
                 if twist_joint == self.joint_two:
                     lower_twist_joint = self.joint_three
 
-                # create twist joints in correct location
-                for twist_count in range(0, self.count_twist_joints+1):
+                # create twist joints in correct location with one extra for joint orient
+                for twist_count in range(0, self.count_twist_joints+2):
                     loc_loc = vector_lerp(cmds.xform(self.prefix + '_' + twist_joint, q=1, t=1, ws=1),
                                       cmds.xform(self.prefix + '_' +  lower_twist_joint, q=1, t=1, ws=1),
                                       crnt_tw_jnt_count * tw_jnt_count_add)
                     # add 1 to crnt_tw_jnt_count
                     crnt_tw_jnt_count = crnt_tw_jnt_count + 1
                     # create locators where the joints would be (testing)
-                    cmds.joint(n=twist_joint + "_twist" + str(crnt_tw_jnt_count-1), p=loc_loc, rad=.5)
-                # delete first joint (will be in the same location as the upper joint)
-                cmds.parent(twist_joint + '_twist1', w=1)
-                cmds.delete(twist_joint + '_twist0')
+                    cmds.joint(n=self.prefix + '_' + twist_joint + "_twist" + str(crnt_tw_jnt_count-1), p=loc_loc, rad=.5)
+                # delete first and last joint (will be in the same location as the upper and lower joints)
+                cmds.parent(self.prefix + '_' + twist_joint + '_twist1', w=1)
+                cmds.delete(self.prefix + '_' + twist_joint + '_twist0')
                 # reset crnt_tw_jnt_count back to 0 for next set of twist joints
                 crnt_tw_jnt_count = 0
 
-            # TODO reset joint hierarchy
-
-            # TODO set twist joint names
-
-            # TODO set twist joints to twist with lower joint orientation
-
-            pass
+            # set joint orients for twist joints
+            for joint_orient in [self.joint_one + '_twist', self.joint_two + '_twist']:
+                cmds.joint(self.prefix + '_' + joint_orient + '1', e=1, zso=1, oj="xyz", ch=1)
+                cmds.delete(self.prefix + '_' + joint_orient + str(self.count_twist_joints+1))
+            # parent upper twist joints to main joint
+            cmds.parent(self.prefix + '_' + self.joint_one + '_twist1', self.prefix + '_' + self.joint_one)
+            cmds.parent(self.prefix + '_' + self.joint_two + '_twist1', self.prefix + '_' + self.joint_two)
 
 
         # Cleanup
@@ -173,4 +173,4 @@ class ThreeJointIK(object):
             # e.g. "L_Shoulder_CTRL"
         cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.scale', lock=True)
         cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.visibility', lock=True)
-        cmds.select(d=1)
+        #cmds.select(d=1)
