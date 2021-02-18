@@ -79,8 +79,11 @@ class BlockBuilder(QtWidgets.QWidget):
         # Checkbox to toggle twist joints on or off
         self.checkboxTwistJoints = QtWidgets.QCheckBox(self, text="Twist Joints")
         self.checkboxTwistJoints.setGeometry(80, 160, 80, 30)
+        # text and textbox for twist joint count textbox
+        self.checkboxCountTwistJoints = QtWidgets.QLineEdit(self, text="2")
+        self.checkboxCountTwistJoints.setGeometry(280, 160, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Count")
-        self.textPrefix.setGeometry(230, 130, 40, 30)
+        self.textPrefix.setGeometry(230, 160, 40, 30)
 
         # button to call the buildBlock function
         self.button = QtWidgets.QPushButton(self, text="Build")
@@ -98,7 +101,7 @@ class BlockBuilder(QtWidgets.QWidget):
         mid_joint_push_back = self.textFieldJointTwoPos.text()
         end_position = self.textFieldJointThreePos.text()
         toggle_twist_joints = self.checkboxTwistJoints.checkState()
-        #count_twist_joints = self.checkboxCountTwistJoints.text()
+        count_twist_joints = self.checkboxCountTwistJoints.text()
 
         import crefx.blockBuilder as bb
         reload(bb)
@@ -112,7 +115,7 @@ class BlockBuilder(QtWidgets.QWidget):
                                 end_location=tuple([int(x) for x in end_position.split(',')]),
                                 mid_joint_push_back=int(mid_joint_push_back),
                                 toggle_twist_joints = toggle_twist_joints,
-                                #count_twist_joints=count_twist_joints
+                                count_twist_joints=int(count_twist_joints)
                                 )
         block.grp_structure()
         block.build()
