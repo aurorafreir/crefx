@@ -1,5 +1,15 @@
 import maya.cmds as cmds
 
+def lerp(min, max, percent):
+    return ((max-min)*percent)+min
+
+
+def vector_lerp(min, max, percent):
+    x = lerp(min[0], max[0], percent)
+    y = lerp(min[1], max[1], percent)
+    z = lerp(min[2], max[2], percent)
+    return x, y, z
+
 class ThreeJointIK(object):
     def __init__(self,
                  prefix='L', # prefix is a prefix before the joint, group (and etc) names, e.g. 'L' or 'R'
@@ -13,7 +23,6 @@ class ThreeJointIK(object):
                  toggle_twist_joints=0,
                  count_twist_joints=2
                  ):
-        # TODO load variables from extensions.json
         self.prefix = prefix
         self.start_location = start_location
         self.end_location = end_location
@@ -21,11 +30,12 @@ class ThreeJointIK(object):
         self.joint_one = joint_one
         self.joint_two = joint_two
         self.joint_three = joint_three
-        self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.block_name=block_name
         self.toggle_twist_joints = toggle_twist_joints
         self.count_twist_joints = count_twist_joints
 
+        # TODO load variables from extensions.json
+        self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
 
 
@@ -39,7 +49,6 @@ class ThreeJointIK(object):
         # TODO set up parenting
 
     def build(self):
-        # TODO Twist Joints
         # TODO End joint orient constraint
         # TODO FKIK
 
@@ -113,7 +122,36 @@ class ThreeJointIK(object):
 
         # Twist Joints
         if self.toggle_twist_joints:
-            print "twist joints on"
+            # TODO Lerp position
+            # TODO Twist Joints
+            # TODO create joints between joint_one and joint_two, and joint_two and joint_three
+            crnt_tw_jnt_count = 0
+            tw_jnt_count_add = 1.0 / self.count_twist_joints
+            for twist_joint in [self.joint_one, self.joint_two]:
+                # set lower joint for twist joints
+                if twist_joint == self.joint_one:
+                    lower_twist_joint = self.joint_two
+                if twist_joint == self.joint_two:
+                    lower_twist_joint = self.joint_three
+
+                #
+                for twist_count in range(1, 1+self.count_twist_joints):
+                    loc_loc = vector_lerp(cmds.xform(self.prefix + '_' + twist_joint, q=1, t=1, ws=1),
+                                      cmds.xform(self.prefix + '_' +  lower_twist_joint, q=1, t=1, ws=1),
+                                      crnt_tw_jnt_count * tw_jnt_count_add)
+
+                    crnt_tw_jnt_count = crnt_tw_jnt_count + 1
+
+                    cmds.spaceLocator(n=twist_joint + "_locator" + str(crnt_tw_jnt_count), p=loc_loc)
+                crnt_tw_jnt_count = 0
+
+            # TODO reset joint hierarchy
+
+            # TODO set twist joint names
+
+            # TODO set twist joints to twist with lower joint orientation
+
+            pass
 
 
         # Cleanup
