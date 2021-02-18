@@ -120,13 +120,13 @@ class ThreeJointIK(object):
                                   self.prefix + '_' + self.block_name + '_' + self.ext[2])
 
 
+        cmds.select(d=1)
+
         # Twist Joints
         if self.toggle_twist_joints:
-            # TODO Lerp position
-            # TODO Twist Joints
             # TODO create joints between joint_one and joint_two, and joint_two and joint_three
             crnt_tw_jnt_count = 0
-            tw_jnt_count_add = 1.0 / self.count_twist_joints
+            tw_jnt_count_add = 1.0 / (self.count_twist_joints+1)
             for twist_joint in [self.joint_one, self.joint_two]:
                 # set lower joint for twist joints
                 if twist_joint == self.joint_one:
@@ -134,15 +134,19 @@ class ThreeJointIK(object):
                 if twist_joint == self.joint_two:
                     lower_twist_joint = self.joint_three
 
-                #
-                for twist_count in range(1, 1+self.count_twist_joints):
+                # create twist joints in correct location
+                for twist_count in range(0, self.count_twist_joints+1):
                     loc_loc = vector_lerp(cmds.xform(self.prefix + '_' + twist_joint, q=1, t=1, ws=1),
                                       cmds.xform(self.prefix + '_' +  lower_twist_joint, q=1, t=1, ws=1),
                                       crnt_tw_jnt_count * tw_jnt_count_add)
-
+                    # add 1 to crnt_tw_jnt_count
                     crnt_tw_jnt_count = crnt_tw_jnt_count + 1
-
-                    cmds.spaceLocator(n=twist_joint + "_locator" + str(crnt_tw_jnt_count), p=loc_loc)
+                    # create locators where the joints would be (testing)
+                    cmds.joint(n=twist_joint + "_twist" + str(crnt_tw_jnt_count-1), p=loc_loc, rad=.5)
+                # delete first joint (will be in the same location as the upper joint)
+                cmds.parent(twist_joint + '_twist1', w=1)
+                cmds.delete(twist_joint + '_twist0')
+                # reset crnt_tw_jnt_count back to 0 for next set of twist joints
                 crnt_tw_jnt_count = 0
 
             # TODO reset joint hierarchy
