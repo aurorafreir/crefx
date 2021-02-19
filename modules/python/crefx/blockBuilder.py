@@ -119,12 +119,15 @@ class ThreeJointIK(object):
         cmds.poleVectorConstraint(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1],
                                   self.prefix + '_' + self.block_name + '_' + self.ext[2])
 
-
         cmds.select(d=1)
+
+
+
+
+
 
         # Twist Joints
         if self.toggle_twist_joints:
-            # TODO create joints between joint_one and joint_two, and joint_two and joint_three
             crnt_tw_jnt_count = 0
             tw_jnt_count_add = 1.0 / (self.count_twist_joints+1)
             for twist_joint in [self.joint_one, self.joint_two]:
@@ -149,13 +152,42 @@ class ThreeJointIK(object):
                 # reset crnt_tw_jnt_count back to 0 for next set of twist joints
                 crnt_tw_jnt_count = 0
 
+
             # set joint orients for twist joints
             for joint_orient in [self.joint_one + '_twist', self.joint_two + '_twist']:
                 cmds.joint(self.prefix + '_' + joint_orient + '1', e=1, zso=1, oj="xyz", ch=1)
                 cmds.delete(self.prefix + '_' + joint_orient + str(self.count_twist_joints+1))
+
             # parent upper twist joints to main joint
             cmds.parent(self.prefix + '_' + self.joint_one + '_twist1', self.prefix + '_' + self.joint_one)
             cmds.parent(self.prefix + '_' + self.joint_two + '_twist1', self.prefix + '_' + self.joint_two)
+
+
+            # TODO set twist to follow lower joint on X based on how many joints there are
+            for joint_twist in [self.joint_one + '_twist', self.joint_two + '_twist']:
+                floatmath = cmds.createNode("floatMath", n=joint_twist + "_Mult")
+                cmds.setAttr(floatmath + ".operation", 2)
+                if joint_twist == self.joint_one + '_twist':
+                    lower_twist_joint = self.joint_two
+                if joint_twist == self.joint_two + '_twist':
+                    lower_twist_joint = self.joint_three
+                print lower_twist_joint
+
+                cmds.setAttr(floatmath + ".floatB", tw_jnt_count_add)
+                cmds.connectAttr(self.prefix + '_' + lower_twist_joint + ".rotateX", floatmath + ".floatA")
+                # Create list of all the twist joints names
+                joint_twist_hierarchy = cmds.listRelatives(self.prefix + '_' + joint_twist + '1', type="joint", ad=1)
+                joint_twist_hierarchy.append(self.prefix + '_' + joint_twist + '1')
+
+                for out_node in joint_twist_hierarchy:
+                    #print out_node
+                    cmds.connectAttr(floatmath + ".outFloat", out_node + ".rotateX")
+                cmds.select(d=1)
+
+
+
+
+
 
 
         # Cleanup
@@ -166,7 +198,6 @@ class ThreeJointIK(object):
         cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[1])
         cmds.bakePartialHistory(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1])
         # Lock the Scale and View attributes on the controllers
-        # TODO set up for loops for these
             # e.g. "L_Wrist_IK_CTRL"
         cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
         cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
