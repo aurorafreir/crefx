@@ -3,7 +3,6 @@ import maya.cmds as cmds
 def lerp(min, max, percent):
     return ((max-min)*percent)+min
 
-
 def vector_lerp(min, max, percent):
     x = lerp(min[0], max[0], percent)
     y = lerp(min[1], max[1], percent)
@@ -86,28 +85,29 @@ class ThreeJointIK(object):
 
 
         # Create Pole Vector controller that looks visually distinct from the others
-        #             e.g. "L_PV_IK_CTRL"
-        cmds.circle(n=self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1], nrx=1, nrz=0)
+        #             e.g. "L_Arm_PV_CTRL"
+        PV = self.prefix + '_' + self.block_name + '_' + self.ext[3]
+        cmds.circle(n=PV+ '_' + self.ext[1], nrx=1, nrz=0)
         cmds.select(d=1)
         for x in range(0, 7)[::2]:
             # select every second joint of the circle made to create the PV controller
-            cmds.select(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1] + '.cv[{}]'.format(x), tgl=0, add=True)
+            cmds.select(PV + '_' + self.ext[1] + '.cv[{}]'.format(x), tgl=0, add=True)
         cmds.selectMode(co=1)
         cmds.xform(s=(.2, .2, .2))
         cmds.selectMode(o=1)
 
         # Create PV parent group and parent PV control to it, and move behind the elbow location
-        cmds.group(n=self.prefix + '_' + self.ext[3] + '_' + self.ext[0], em=1)
-        # parents PV control to PV Group    # e.g. "L_PV_IK_CTRL" > "L_PV_GRP"
-        cmds.parent(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1],
-                    self.prefix + '_' + self.ext[3] + '_' + self.ext[0])
-        # Move the PV group to joint_two    # e.g. "L_PV_GRP > "L_Elbow"
-        cmds.xform(self.prefix + '_' + self.ext[3] + '_' + self.ext[0],
+        cmds.group(n=PV + '_' + self.ext[0], em=1)
+        # parents PV control to PV Group    # e.g. "L_Arm_PV_CTRL" > "L_Arm_PV_GRP"
+        cmds.parent(PV + '_' + self.ext[1],
+                    PV+ '_' + self.ext[0])
+        # Move the PV group to joint_two    # e.g. "L_Arm_PV_GRP > "L_Elbow"
+        cmds.xform(PV +  '_' + self.ext[0],
                    t=(cmds.xform(self.prefix + '_' + self.joint_two, q=1, t=1, ws=1)))
-            # e.g. "L_PV_GRP"
-        cmds.xform(self.prefix + '_' + self.ext[3] + '_' + self.ext[0], t=(0, 0, - self.mid_joint_push_back*3), r=1)
-        # Pole Vector constrain the IK to the PV Controller     # e.g. "L_PV_IK_CTRL" > "L_Arm_IK"
-        cmds.poleVectorConstraint(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1],
+            # e.g. "L_Arm_PV_GRP"
+        cmds.xform(PV + '_' + self.ext[0], t=(0, 0, - self.mid_joint_push_back*3), r=1)
+        # Pole Vector constrain the IK to the PV Controller     # e.g. "L_Arm_PV_CTRL" > "L_Arm_IK"
+        cmds.poleVectorConstraint(PV + '_' + self.ext[1],
                                   self.prefix + '_' + self.block_name + '_' + self.ext[2])
 
         cmds.select(d=1)
@@ -118,7 +118,7 @@ class ThreeJointIK(object):
         # delete history on joint_one, joint_three, and PV controller   # e.g. "L_Wrist_IK_CTRL", "L_PV_IK_CTRL"
         cmds.bakePartialHistory(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1])
         cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[1])
-        cmds.bakePartialHistory(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1])
+        cmds.bakePartialHistory(self.prefix + '_' + self.block_name + '_' + self.ext[3] + '_' + self.ext[1])
         # Lock the Scale and View attributes on the controllers
             # e.g. "L_Wrist_IK_CTRL"
         cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
@@ -200,4 +200,14 @@ class ThreeJointIK(object):
             for attr in ['t', 's', 'r']:
                 cmds.setAttr(grp + '.' + attr, lock=True)
         cmds.select(d=1)
-        # TODO set up parenting
+
+        # Parent joint_one to prefix_blockName_Skel_GRP
+        cmds.parent(self.prefix + '_' + self.joint_one,
+                    self.prefix + '_' + self.block_name + '_Skel_' + self.ext[0])
+        # Parent controls to prefix_blockName_Ctrls_GRP
+        cmds.parent(self.prefix + '_' + self.joint_one + '_' + self.ext[0],
+                    self.prefix + '_' + self.block_name + '_Ctrls_' + self.ext[0])
+        cmds.parent(self.prefix + '_' + self.block_name + '_' + self.ext[3] + '_' + self.ext[0],
+                    self.prefix + '_' + self.block_name + '_Ctrls_' + self.ext[0])
+        cmds.parent(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[0],
+                    self.prefix + '_' + self.block_name + '_Ctrls_' + self.ext[0])
