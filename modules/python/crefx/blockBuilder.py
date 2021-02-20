@@ -39,15 +39,6 @@ class ThreeJointIK(object):
         self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
 
 
-    def grp_structure(self):
-        self.grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + self.ext[0])
-        for item in self.sub_grps:
-            grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + item + '_' + self.ext[0], p=self.grp)
-            for attr in ['t', 's', 'r']:
-                cmds.setAttr(grp + '.' + attr, lock=True)
-        cmds.select(d=1)
-        # TODO set up parenting
-
     def build(self):
         # TODO End joint orient constraint
         # TODO FKIK
@@ -121,9 +112,23 @@ class ThreeJointIK(object):
 
         cmds.select(d=1)
 
+        # Cleanup
+        # Hide the IK Handle    # e.g. "L_Arm_IK"
+        cmds.hide(self.prefix+'_' + self.block_name + '_' + self.ext[2])
+        # delete history on joint_one, joint_three, and PV controller   # e.g. "L_Wrist_IK_CTRL", "L_PV_IK_CTRL"
+        cmds.bakePartialHistory(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1])
+        cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[1])
+        cmds.bakePartialHistory(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1])
+        # Lock the Scale and View attributes on the controllers
+            # e.g. "L_Wrist_IK_CTRL"
+        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
+            # e.g. "L_Shoulder_CTRL"
+        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.scale', lock=True)
+        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.visibility', lock=True)
+        #cmds.select(d=1)
 
-
-
+    def build_twist(self):
         # Twist Joints
         if self.toggle_twist_joints:
             crnt_tw_jnt_count = 0
@@ -184,18 +189,15 @@ class ThreeJointIK(object):
                 cmds.select(d=1)
 
 
-        # Cleanup
-        # Hide the IK Handle    # e.g. "L_Arm_IK"
-        cmds.hide(self.prefix+'_' + self.block_name + '_' + self.ext[2])
-        # delete history on joint_one, joint_three, and PV controller   # e.g. "L_Wrist_IK_CTRL", "L_PV_IK_CTRL"
-        cmds.bakePartialHistory(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1])
-        cmds.bakePartialHistory(self.prefix + '_' + self.joint_one + '_' + self.ext[1])
-        cmds.bakePartialHistory(self.prefix + '_' + self.ext[3] + '_' + self.ext[2] + '_' + self.ext[1])
-        # Lock the Scale and View attributes on the controllers
-            # e.g. "L_Wrist_IK_CTRL"
-        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.scale', lock=True)
-        cmds.setAttr(self.prefix+'_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1] + '.visibility', lock=True)
-            # e.g. "L_Shoulder_CTRL"
-        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.scale', lock=True)
-        cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.visibility', lock=True)
-        #cmds.select(d=1)
+
+
+    def grp_structure(self):
+        self.grp = cmds.createNode('transform', name=self.prefix + '_' + self.block_name + '_' + self.ext[0])
+        for item in self.sub_grps:
+            grp = cmds.createNode('transform',
+                                  name=self.prefix + '_' + self.block_name + '_' + item + '_' + self.ext[0],
+                                  p=self.grp)
+            for attr in ['t', 's', 'r']:
+                cmds.setAttr(grp + '.' + attr, lock=True)
+        cmds.select(d=1)
+        # TODO set up parenting
