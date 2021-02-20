@@ -13,7 +13,11 @@ def maya_main_window():
 class BlockBuilder(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(BlockBuilder, self).__init__()
+        self.create_widget()
+        self.create_connections()
 
+
+    def create_widget(self):
         self.setWindowFlags(QtCore.Qt.Tool)
 
         self.setParent(maya_main_window())
@@ -84,12 +88,20 @@ class BlockBuilder(QtWidgets.QWidget):
         self.checkboxCountTwistJoints.setGeometry(280, 160, 150, 30)
         self.textPrefix = QtWidgets.QLabel(self, text="Count")
         self.textPrefix.setGeometry(230, 160, 40, 30)
+        self.checkboxCountTwistJoints.setEnabled(False)
 
         # button to call the buildBlock function
         self.button = QtWidgets.QPushButton(self, text="Build")
         self.button.setGeometry(50, 200, 150, 30)
 
         self.button.clicked.connect(self.buildBlock)
+
+    # function to toggle Twist joints on/off based on Twist Joints checkbox
+    def twist_joints_text_enabled(self):
+        self.checkboxCountTwistJoints.setEnabled(self.checkboxTwistJoints.isChecked())
+
+    def create_connections(self):
+        self.checkboxTwistJoints.stateChanged.connect(self.twist_joints_text_enabled)
 
     def buildBlock(self):
         prefix = self.textFieldPrefix.text()
@@ -122,10 +134,12 @@ class BlockBuilder(QtWidgets.QWidget):
 
         print "build block", prefix + '_' + block_name
 
-try:
-    ui.deleteLater()
-except NameError as e:
-    pass
+
+
+#try:
+#    ui.deleteLater()
+#except NameError as e:
+#    pass
 
 ui = BlockBuilder()
 ui.show()
