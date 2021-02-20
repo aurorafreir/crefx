@@ -124,8 +124,6 @@ class ThreeJointIK(object):
 
 
 
-
-
         # Twist Joints
         if self.toggle_twist_joints:
             crnt_tw_jnt_count = 0
@@ -163,31 +161,27 @@ class ThreeJointIK(object):
             cmds.parent(self.prefix + '_' + self.joint_two + '_twist1', self.prefix + '_' + self.joint_two)
 
 
-            # TODO set twist to follow lower joint on X based on how many joints there are
+            # Set up floatmath and connect up the joint rotations for each set of twist joints
             for joint_twist in [self.joint_one + '_twist', self.joint_two + '_twist']:
+                # Create floatmath node and set it's operation to Multiply
                 floatmath = cmds.createNode("floatMath", n=joint_twist + "_Mult")
                 cmds.setAttr(floatmath + ".operation", 2)
+                # Set the multiplication variable to 1 divided by the number of twist joints
+                cmds.setAttr(floatmath + ".floatB", tw_jnt_count_add)
+                # Set lower_twist_joint variable
                 if joint_twist == self.joint_one + '_twist':
                     lower_twist_joint = self.joint_two
-                if joint_twist == self.joint_two + '_twist':
+                else:
                     lower_twist_joint = self.joint_three
-                print lower_twist_joint
-
-                cmds.setAttr(floatmath + ".floatB", tw_jnt_count_add)
+                # Connect the lower_twist_joint's X rotation to the floatA input on the floatMath node
                 cmds.connectAttr(self.prefix + '_' + lower_twist_joint + ".rotateX", floatmath + ".floatA")
                 # Create list of all the twist joints names
                 joint_twist_hierarchy = cmds.listRelatives(self.prefix + '_' + joint_twist + '1', type="joint", ad=1)
                 joint_twist_hierarchy.append(self.prefix + '_' + joint_twist + '1')
-
+                # Connect each twist joint's X axis to the floatMath node's outFloat output
                 for out_node in joint_twist_hierarchy:
-                    #print out_node
                     cmds.connectAttr(floatmath + ".outFloat", out_node + ".rotateX")
                 cmds.select(d=1)
-
-
-
-
-
 
 
         # Cleanup
