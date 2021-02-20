@@ -112,6 +112,10 @@ class ThreeJointIK(object):
 
         cmds.select(d=1)
 
+        # Set Orient Constraint from joint_three controller to joint_three  #e.g. "L_Wrist_IK_CTRL" > "L_Wrist"
+        cmds.orientConstraint(self.prefix + '_' + self.joint_three + '_' + self.ext[2] + '_' + self.ext[1],
+                              self.prefix + '_' + self.joint_three)
+
         # Cleanup
         # Hide the IK Handle    # e.g. "L_Arm_IK"
         cmds.hide(self.prefix+'_' + self.block_name + '_' + self.ext[2])
@@ -127,6 +131,7 @@ class ThreeJointIK(object):
         cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.scale', lock=True)
         cmds.setAttr(self.prefix+'_' + self.joint_one + '_' + self.ext[1] + '.visibility', lock=True)
         #cmds.select(d=1)
+
 
     def build_twist(self):
         # Twist Joints
