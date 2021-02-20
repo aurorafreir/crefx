@@ -129,8 +129,9 @@ class BlockBuilder(QtWidgets.QWidget):
                                 toggle_twist_joints = toggle_twist_joints,
                                 count_twist_joints=int(count_twist_joints)
                                 )
-        block.grp_structure()
         block.build()
+        block.build_twist()
+        block.grp_structure()
 
         print "build block", prefix + '_' + block_name
 
