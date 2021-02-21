@@ -33,15 +33,13 @@ class ThreeJointIK(object):
         self.toggle_twist_joints = toggle_twist_joints
         self.count_twist_joints = count_twist_joints
 
-        # TODO load variables from extensions.json
         self.ext = ['GRP', 'CTRL', 'IK', 'PV']
         self.sub_grps = ['Skel', 'Ctrls', 'Parts', 'In', 'Out']
 
 
     def build(self):
-        # TODO End joint orient constraint
         # TODO FKIK
-
+        # TODO clean up variable setups
         # Create joints for chain
         cmds.joint(n=self.prefix + '_' + self.joint_one, p=self.start_location) # joint_one
         cmds.joint(n=self.prefix + '_' + self.joint_two,
