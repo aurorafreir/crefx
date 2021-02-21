@@ -1,6 +1,7 @@
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from PySide2 import QtCore
+from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 
 from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
@@ -10,7 +11,7 @@ def maya_main_window():
     main_window_ptr = omui.MQtUtil.mainWindow()
     return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
 
-class BlockBuilder(QtWidgets.QWidget):
+class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(BlockBuilder, self).__init__()
         self.create_widget()
@@ -18,15 +19,16 @@ class BlockBuilder(QtWidgets.QWidget):
 
 
     def create_widget(self):
+        self.setObjectName('CreateBlockUI_UniqueId')
         self.setWindowFlags(QtCore.Qt.Tool)
 
         self.setParent(maya_main_window())
         self.setWindowFlags(QtCore.Qt.Window)
 
         # Set the object name
-        self.setObjectName('CreateBlockUI_UniqueId')
+
         self.setWindowTitle('Create Block')
-        self.setGeometry(50, 50, 500, 250)
+        self.setGeometry(100, 100, 500, 250)
 
 
         # text and textbox for block_name
@@ -63,7 +65,7 @@ class BlockBuilder(QtWidgets.QWidget):
 
         # text and textbox for mid_joint_push_back
         self.textFieldJointTwoPos = QtWidgets.QLineEdit(self, text="1")
-        self.textFieldJointTwoPos.setGeometry(280, 100, 150, 30)
+        self.textFieldJointTwoPos.setGeometry(280, 105, 50, 20)
         self.textPrefix = QtWidgets.QLabel(self, text="Mid Joint Z")
         self.textPrefix.setGeometry(230, 100, 40, 30)
 
@@ -85,7 +87,7 @@ class BlockBuilder(QtWidgets.QWidget):
         self.checkboxTwistJoints.setGeometry(80, 160, 80, 30)
         # text and textbox for twist joint count textbox
         self.checkboxCountTwistJoints = QtWidgets.QLineEdit(self, text="2")
-        self.checkboxCountTwistJoints.setGeometry(280, 160, 150, 30)
+        self.checkboxCountTwistJoints.setGeometry(280, 165, 50, 20)
         self.textPrefix = QtWidgets.QLabel(self, text="Count")
         self.textPrefix.setGeometry(230, 160, 40, 30)
         self.checkboxCountTwistJoints.setEnabled(False)
@@ -138,10 +140,10 @@ class BlockBuilder(QtWidgets.QWidget):
 
 
 
-#try:
-#    ui.deleteLater()
-#except NameError as e:
-#    pass
+try:
+    ui.deleteLater()
+except NameError as e:
+    pass
 
 ui = BlockBuilder()
-ui.show()
+ui.show(dockable=True)
