@@ -130,6 +130,7 @@ class BlockBuilder(QtWidgets.QWidget):
                                 count_twist_joints=int(count_twist_joints)
                                 )
         block.build()
+        # TODO add if here instead of in blockBuilder.py
         block.build_twist()
         block.grp_structure()
 
