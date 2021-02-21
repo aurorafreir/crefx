@@ -2,6 +2,7 @@ from PySide2 import QtGui
 from PySide2 import QtWidgets
 from PySide2 import QtCore
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+import maya.cmds as cmds
 
 from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
@@ -19,16 +20,16 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
 
 
     def create_widget(self):
-        self.setObjectName('CreateBlockUI_UniqueId')
         self.setWindowFlags(QtCore.Qt.Tool)
 
         self.setParent(maya_main_window())
         self.setWindowFlags(QtCore.Qt.Window)
 
         # Set the object name
-
+        self.setObjectName('CreateBlockUI_UniqueId')
         self.setWindowTitle('Create Block')
         self.setGeometry(100, 100, 500, 250)
+        self.setMinimumSize(200, 200)
 
 
         # text and textbox for block_name
@@ -141,9 +142,13 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
 
 
 try:
-    ui.deleteLater()
+    pass
+    #ui.deleteLater()
 except NameError as e:
     pass
+
+if cmds.window("CreateBlockUI_UniqueIdWorkspaceControl", exists=True):
+    cmds.deleteUI("CreateBlockUI_UniqueIdWorkspaceControl")
 
 ui = BlockBuilder()
 ui.show(dockable=True)
