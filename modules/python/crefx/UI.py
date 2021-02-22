@@ -115,7 +115,7 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
         start_position = self.textFieldJointOnePos.text()
         mid_joint_push_back = self.textFieldJointTwoPos.text()
         end_position = self.textFieldJointThreePos.text()
-        toggle_twist_joints = self.checkboxTwistJoints.checkState()
+        #toggle_twist_joints = self.checkboxTwistJoints.checkState()
         count_twist_joints = self.checkboxCountTwistJoints.text()
 
         import crefx.blockBuilder as bb
@@ -129,16 +129,16 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
                                 start_location=tuple([int(x) for x in start_position.split(',')]),
                                 end_location=tuple([int(x) for x in end_position.split(',')]),
                                 mid_joint_push_back=int(mid_joint_push_back),
-                                toggle_twist_joints = toggle_twist_joints,
+                                #toggle_twist_joints = toggle_twist_joints,
                                 count_twist_joints=int(count_twist_joints)
                                 )
         block.build()
         # TODO add if here instead of in blockBuilder.py
-        block.build_twist()
+        if self.checkboxTwistJoints.checkState():
+            block.build_twist()
         block.grp_structure()
 
         print "build block", prefix + '_' + block_name
-
 
 
 try:

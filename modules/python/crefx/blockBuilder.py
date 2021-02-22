@@ -133,63 +133,63 @@ class ThreeJointIK(object):
 
     def build_twist(self):
         # Twist Joints
-        if self.toggle_twist_joints:
+        # TODO fix to make autoskinning work properly
+        crnt_tw_jnt_count = 0
+        tw_jnt_count_add = 1.0 / (self.count_twist_joints+1)
+        for twist_joint in [self.joint_one, self.joint_two]:
+            # set lower joint for twist joints
+            if twist_joint == self.joint_one:
+                lower_twist_joint = self.joint_two
+            if twist_joint == self.joint_two:
+                lower_twist_joint = self.joint_three
+
+            # create twist joints in correct location with one extra for joint orient
+            for twist_count in range(0, self.count_twist_joints+2):
+                loc_loc = vector_lerp(cmds.xform(self.prefix + '_' + twist_joint, q=1, t=1, ws=1),
+                                  cmds.xform(self.prefix + '_' +  lower_twist_joint, q=1, t=1, ws=1),
+                                  crnt_tw_jnt_count * tw_jnt_count_add)
+                # add 1 to crnt_tw_jnt_count
+                crnt_tw_jnt_count = crnt_tw_jnt_count + 1
+                # create locators where the joints would be (testing)
+                cmds.joint(n=self.prefix + '_' + twist_joint + "_twist" + str(crnt_tw_jnt_count-1), p=loc_loc, rad=.5)
+            # delete first and last joint (will be in the same location as the upper and lower joints)
+            cmds.parent(self.prefix + '_' + twist_joint + '_twist1', w=1)
+            cmds.delete(self.prefix + '_' + twist_joint + '_twist0')
+            # reset crnt_tw_jnt_count back to 0 for next set of twist joints
             crnt_tw_jnt_count = 0
-            tw_jnt_count_add = 1.0 / (self.count_twist_joints+1)
-            for twist_joint in [self.joint_one, self.joint_two]:
-                # set lower joint for twist joints
-                if twist_joint == self.joint_one:
-                    lower_twist_joint = self.joint_two
-                if twist_joint == self.joint_two:
-                    lower_twist_joint = self.joint_three
-
-                # create twist joints in correct location with one extra for joint orient
-                for twist_count in range(0, self.count_twist_joints+2):
-                    loc_loc = vector_lerp(cmds.xform(self.prefix + '_' + twist_joint, q=1, t=1, ws=1),
-                                      cmds.xform(self.prefix + '_' +  lower_twist_joint, q=1, t=1, ws=1),
-                                      crnt_tw_jnt_count * tw_jnt_count_add)
-                    # add 1 to crnt_tw_jnt_count
-                    crnt_tw_jnt_count = crnt_tw_jnt_count + 1
-                    # create locators where the joints would be (testing)
-                    cmds.joint(n=self.prefix + '_' + twist_joint + "_twist" + str(crnt_tw_jnt_count-1), p=loc_loc, rad=.5)
-                # delete first and last joint (will be in the same location as the upper and lower joints)
-                cmds.parent(self.prefix + '_' + twist_joint + '_twist1', w=1)
-                cmds.delete(self.prefix + '_' + twist_joint + '_twist0')
-                # reset crnt_tw_jnt_count back to 0 for next set of twist joints
-                crnt_tw_jnt_count = 0
 
 
-            # set joint orients for twist joints
-            for joint_orient in [self.joint_one + '_twist', self.joint_two + '_twist']:
-                cmds.joint(self.prefix + '_' + joint_orient + '1', e=1, zso=1, oj="xyz", ch=1)
-                cmds.delete(self.prefix + '_' + joint_orient + str(self.count_twist_joints+1))
+        # set joint orients for twist joints
+        for joint_orient in [self.joint_one + '_twist', self.joint_two + '_twist']:
+            cmds.joint(self.prefix + '_' + joint_orient + '1', e=1, zso=1, oj="xyz", ch=1)
+            cmds.delete(self.prefix + '_' + joint_orient + str(self.count_twist_joints+1))
 
-            # parent upper twist joints to main joint
-            cmds.parent(self.prefix + '_' + self.joint_one + '_twist1', self.prefix + '_' + self.joint_one)
-            cmds.parent(self.prefix + '_' + self.joint_two + '_twist1', self.prefix + '_' + self.joint_two)
+        # parent upper twist joints to main joint
+        cmds.parent(self.prefix + '_' + self.joint_one + '_twist1', self.prefix + '_' + self.joint_one)
+        cmds.parent(self.prefix + '_' + self.joint_two + '_twist1', self.prefix + '_' + self.joint_two)
 
 
-            # Set up floatmath and connect up the joint rotations for each set of twist joints
-            for joint_twist in [self.joint_one + '_twist', self.joint_two + '_twist']:
-                # Create floatmath node and set it's operation to Multiply
-                floatmath = cmds.createNode("floatMath", n=joint_twist + "_Mult")
-                cmds.setAttr(floatmath + ".operation", 2)
-                # Set the multiplication variable to 1 divided by the number of twist joints
-                cmds.setAttr(floatmath + ".floatB", tw_jnt_count_add)
-                # Set lower_twist_joint variable
-                if joint_twist == self.joint_one + '_twist':
-                    lower_twist_joint = self.joint_two
-                else:
-                    lower_twist_joint = self.joint_three
-                # Connect the lower_twist_joint's X rotation to the floatA input on the floatMath node
-                cmds.connectAttr(self.prefix + '_' + lower_twist_joint + ".rotateX", floatmath + ".floatA")
-                # Create list of all the twist joints names
-                joint_twist_hierarchy = cmds.listRelatives(self.prefix + '_' + joint_twist + '1', type="joint", ad=1)
-                joint_twist_hierarchy.append(self.prefix + '_' + joint_twist + '1')
-                # Connect each twist joint's X axis to the floatMath node's outFloat output
-                for out_node in joint_twist_hierarchy:
-                    cmds.connectAttr(floatmath + ".outFloat", out_node + ".rotateX")
-                cmds.select(d=1)
+        # Set up floatmath and connect up the joint rotations for each set of twist joints
+        for joint_twist in [self.joint_one + '_twist', self.joint_two + '_twist']:
+            # Create floatmath node and set it's operation to Multiply
+            floatmath = cmds.createNode("floatMath", n=joint_twist + "_Mult")
+            cmds.setAttr(floatmath + ".operation", 2)
+            # Set the multiplication variable to 1 divided by the number of twist joints
+            cmds.setAttr(floatmath + ".floatB", tw_jnt_count_add)
+            # Set lower_twist_joint variable
+            if joint_twist == self.joint_one + '_twist':
+                lower_twist_joint = self.joint_two
+            else:
+                lower_twist_joint = self.joint_three
+            # Connect the lower_twist_joint's X rotation to the floatA input on the floatMath node
+            cmds.connectAttr(self.prefix + '_' + lower_twist_joint + ".rotateX", floatmath + ".floatA")
+            # Create list of all the twist joints names
+            joint_twist_hierarchy = cmds.listRelatives(self.prefix + '_' + joint_twist + '1', type="joint", ad=1)
+            joint_twist_hierarchy.append(self.prefix + '_' + joint_twist + '1')
+            # Connect each twist joint's X axis to the floatMath node's outFloat output
+            for out_node in joint_twist_hierarchy:
+                cmds.connectAttr(floatmath + ".outFloat", out_node + ".rotateX")
+            cmds.select(d=1)
 
 
 
