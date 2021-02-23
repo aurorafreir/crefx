@@ -66,9 +66,9 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
 
         # text and textbox for mid_joint_push_back
         self.textFieldJointTwoPos = QtWidgets.QLineEdit(self, text="1")
-        self.textFieldJointTwoPos.setGeometry(280, 105, 50, 20)
+        self.textFieldJointTwoPos.setGeometry(300, 105, 50, 20)
         self.textPrefix = QtWidgets.QLabel(self, text="Mid Joint Z")
-        self.textPrefix.setGeometry(230, 100, 40, 30)
+        self.textPrefix.setGeometry(230, 100, 80, 30)
 
 
         # text and textbox for joint_three
@@ -88,7 +88,7 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
         self.checkboxTwistJoints.setGeometry(80, 160, 80, 30)
         # text and textbox for twist joint count textbox
         self.checkboxCountTwistJoints = QtWidgets.QLineEdit(self, text="2")
-        self.checkboxCountTwistJoints.setGeometry(280, 165, 50, 20)
+        self.checkboxCountTwistJoints.setGeometry(300, 165, 50, 20)
         self.textPrefix = QtWidgets.QLabel(self, text="Count")
         self.textPrefix.setGeometry(230, 160, 40, 30)
         self.checkboxCountTwistJoints.setEnabled(False)
