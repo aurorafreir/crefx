@@ -133,7 +133,7 @@ class BlockBuilder(MayaQWidgetDockableMixin, QtWidgets.QWidget):
                                 count_twist_joints=int(count_twist_joints)
                                 )
         block.build()
-        # TODO add if here instead of in blockBuilder.py
+        # todo add if here instead of in blockBuilder.py
         if self.checkboxTwistJoints.checkState():
             block.build_twist()
         block.grp_structure()

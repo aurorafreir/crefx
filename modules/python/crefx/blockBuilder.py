@@ -38,8 +38,8 @@ class ThreeJointIK(object):
 
 
     def build(self):
-        # TODO FKIK
-        # TODO clean up variable setups
+        # todo FKIK
+        # todo clean up variable setups
         # Create joints for chain
         cmds.joint(n=self.prefix + '_' + self.joint_one, p=self.start_location) # joint_one
         cmds.joint(n=self.prefix + '_' + self.joint_two,
@@ -133,7 +133,7 @@ class ThreeJointIK(object):
 
     def build_twist(self):
         # Twist Joints
-        # TODO fix to make autoskinning work properly
+        # todo fix to make autoskinning work properly
         crnt_tw_jnt_count = 0
         tw_jnt_count_add = 1.0 / (self.count_twist_joints+1)
         for twist_joint in [self.joint_one, self.joint_two]:
